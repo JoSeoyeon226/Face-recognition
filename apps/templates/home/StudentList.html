@@ -1,0 +1,93 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 학생목록 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+<div class="py-4">
+    <div class="d-flex justify-content-between w-100 flex-wrap">
+        <div class="mb-3 mb-lg-0">
+            <h1 class="h3">[학생목록]</h1>
+        </div>
+        <div>
+            <a href="student_create" class="btn btn-info">학생 등록</a>
+        </div>
+    </div>
+</div>
+
+
+<div class="card border-0 shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-centered table-nowrap mb-0 rounded">
+                <thead class="thead-light">
+                <tr>
+                    <th class="border-0">학번</th>
+                    <th class="border-0">이름</th>
+                    <th class="border-0">출석시간</th>
+                    <th class="border-0">수정일시</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% if ingredient_list %}
+                        {% for ingredient in ingredient_list %}
+                            <tr>
+                                <td>{{ ingredient.ingredient }}</td>
+                                <td>{{ ingredient.created_datetime }}</td>
+                                <td>
+                                    <a href="ingredient_update/{{ ingredient.id }}" class="btn btn-warning btn-sm">수정</a>
+                                    <button type="button" class="btn btn-danger btn-sm btn-show-modal-delete" data-url="ingredient_delete/{{ ingredient.id }}">삭제</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3">데이터가 없습니다.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h2 class="h6 modal-title">삭제</h2>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <p>데이터를 삭제하시겠습니까?</p>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-danger btn-delete-confirm">삭제</button>
+              <button type="button" class="btn btn-link text-gray-600 ms-auto" data-bs-dismiss="modal">취소</button>
+          </div>
+      </div>
+  </div>
+</div>  -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE
+{% block javascripts %}
+<script>
+    let url = '';
+
+    $('.btn-show-modal-delete').on('click', function() {
+        url = $(this).data('url');
+        console.log(url);
+        $('#modal-delete').modal('show');
+    })
+
+    $('.btn-delete-confirm').on('click', function() {
+        $(location).attr('href', url);
+    })
+</script>
+{% endblock javascripts %}-->

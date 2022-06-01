@@ -190,7 +190,6 @@ The project is coded using blueprints, app factory pattern, dual configuration p
    |    |    |    |-- register.html         # Register page
    |    |    |
    |    |    |-- home/                      # UI Kit Pages
-   |    |         |-- index.html            # Index page
    |    |         |-- 404-page.html         # 404 page
    |    |         |-- *.html                # All other pages
    |    |    

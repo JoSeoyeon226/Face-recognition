@@ -1,0 +1,30 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 메인페이지 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <thead>
+        <style>
+             #divPosition{
+                 width: auto;
+                 height: auto;
+                 margin: 100px 0px 100px 0px;
+             }
+        </style>
+
+    </thead>
+    <tbody>
+        <div style="text-align: center;">
+            <div id = "divPosition">
+                <img class="img-fluid w-20" src="/static/assets/img/Symbol/Emblem.png" alt="Emblem">
+            </div>
+        </div>
+    </tbody>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
+

@@ -1,0 +1,40 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 출결 수정 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="py-4">
+      <div class="d-flex justify-content-between w-100 flex-wrap">
+          <div class="mb-3 mb-lg-0">
+              <h1 class="h4">출결 수정</h1>
+          </div>
+      </div>
+  </div>
+
+  <div class="card border-0 shadow mb-4">
+      <div class="card-body">
+          <div class="row mb-4">
+              <div class="col-lg-4 col-sm-6">
+                  <form method="post">
+                      <div class="mb-4">
+                          <label for="ingredient">유해성분</label>
+                          <input type="text" class="form-control" id="ingredient" name="ingredient" value="{{ ingredient.ingredient }}" placeholder="유해성분">
+                      </div>
+                      <div class="mb-4">
+                          <a href="ingredient_list" class="btn btn-secondary">취소</a>
+                          <button type="submit" class="btn btn-primary">수정</button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
