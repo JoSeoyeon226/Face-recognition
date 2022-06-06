@@ -1,0 +1,129 @@
+{% extends "layouts/base_student.html" %}
+
+{% block title %} 웹카메라 - 카메라 캡쳐 {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <style>
+        #videoElement {
+            width: 500px;
+            height: 375px;
+            background-color: #666;
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+
+            <!-- [ Main Content ] start -->
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>카메라</h5>
+                        </div>
+                        <div class="card-body">
+                            <video autoplay="true" id="videoElement"></video>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-success btn-start mr-3">시작</button>
+                            <button class="btn btn-sm btn-danger btn-stop mr-3">중지</button>
+                            <button class="btn btn-sm btn-primary btn-capture">캡쳐</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>캡쳐</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="capture" width="500" height="375" style="border: 1px solid #ddd;"></canvas>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-danger btn-capture-delete">지우기</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- [ Main Content ] end -->
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script>
+        let video = document.querySelector('#videoElement');
+
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({video: true})
+                .then(function (stream) {
+                    video.srcObject = stream;
+                })
+                .catch(function (err0r) {
+                    console.log('Something went wrong!');
+                });
+        }
+
+        // 중지
+        $(".btn-stop").on('click', function () {
+            let stream = video.srcObject;
+            let tracks = stream.getTracks();
+
+            for (let i = 0; i < tracks.length; i++) {
+                let track = tracks[i];
+                track.stop();
+            }
+
+            video.srcObject = null;
+        })
+
+        // 시작
+        $(".btn-start").on('click', function () {
+            if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({video: true})
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                    })
+                    .catch(function (err0r) {
+                        console.log('Something went wrong!');
+                    });
+            }
+        })
+
+        // 캡쳐
+        $(`.btn-capture`).on('click', function () {
+            let capture = $('#capture')[0];
+            let ctx = capture.getContext('2d');
+            ctx.drawImage(video, 0, 0, capture.width, capture.height);
+        })
+
+        // 지우기
+        $(".btn-capture-delete").on('click', function () {
+            let capture = $('#capture')[0];
+            let ctx = capture.getContext('2d');
+            ctx.clearRect(0, 0, capture.width, capture.height);
+        })
+    </script>
+{% endblock javascripts %}

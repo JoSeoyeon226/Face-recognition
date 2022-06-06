@@ -1,0 +1,40 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 학생 정보 수정 {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="py-4">
+      <div class="d-flex justify-content-between w-100 flex-wrap">
+          <div class="mb-3 mb-lg-0">
+              <h1 class="h4">학생 정보 수정</h1>
+          </div>
+      </div>
+  </div>
+
+  <div class="card border-0 shadow mb-4">
+      <div class="card-body">
+          <div class="row mb-4">
+              <div class="col-lg-4 col-sm-6">
+                  <form method="post">
+                      <div class="mb-4">
+                          <input type="text" class="form-control" id="StudentName" value="{{ StudentList.StudentName }}" placeholder="이름">
+                          <input type="text" class="form-control" id="StudentId" value="{{ StudentList.StudentId }}" placeholder="학번">
+                      </div>
+                      <div class="mb-4">
+                          <button type="submit" class="btn btn-primary">수정</button>
+                          <a href="StudentList" class="btn btn-secondary">취소</a>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

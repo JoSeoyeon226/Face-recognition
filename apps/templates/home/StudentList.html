@@ -14,7 +14,7 @@
             <h1 class="h3">[학생목록]</h1>
         </div>
         <div>
-            <a href="student_create" class="btn btn-info">학생 등록</a>
+            <a href="StudentList_Create.html" class="btn btn-info">학생 등록</a>
         </div>
     </div>
 </div>
@@ -33,14 +33,14 @@
                 </tr>
                 </thead>
                 <tbody>
-                    {% if ingredient_list %}
-                        {% for ingredient in ingredient_list %}
+                    {% if StudentList %}
+                        {% for home in StudentList %}
                             <tr>
-                                <td>{{ ingredient.ingredient }}</td>
-                                <td>{{ ingredient.created_datetime }}</td>
+                                <td>{{ StudentList.StudentName }}</td>
+                                <td>{{ StudentList.created_datetime }}</td>
                                 <td>
-                                    <a href="ingredient_update/{{ ingredient.id }}" class="btn btn-warning btn-sm">수정</a>
-                                    <button type="button" class="btn btn-danger btn-sm btn-show-modal-delete" data-url="ingredient_delete/{{ ingredient.id }}">삭제</button>
+                                    <a href="StudentList_Update/{ StudentId }}" class="btn btn-warning btn-sm">수정</a>
+                                    <button type="button" class="btn btn-danger btn-sm btn-show-modal-delete" data-url="StudentList_Delete/{{ StudentId }}">삭제</button>
                                 </td>
                             </tr>
                         {% endfor %}

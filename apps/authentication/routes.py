@@ -23,6 +23,8 @@ def route_default():
 
 # Login & Registration
 
+@blueprint.route('/Ca')
+
 @blueprint.route('/AdminLogin', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm(request.form)

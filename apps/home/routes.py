@@ -1,23 +1,38 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 from apps.home import blueprint
-from flask import render_template, request
+from flask import render_template, request, redirect, url_for
 from flask_login import login_required
 from jinja2 import TemplateNotFound
+from apps.home.models import StudentList
+from apps.home.forms import StudentListForm
+from datetime import datetime
+from apps import db
+
 
 
 @blueprint.route('/')
 def route_default():
     return render_template('home/choice.html', segment='choice')
 
-
-@blueprint.route('/index')
+@blueprint.route('/AdminMain')
 @login_required
 def index():
     return render_template('home/AdminMain.html', segment='index')
+
+@blueprint.route('/Capture')
+def capture():
+    return render_template('home/Capture.html', segment='Capture')
+
+
+# 학생목록
+@blueprint.route('/StudentList')
+@login_required
+def StudentList():
+    return render_template('home/StudentList.html', segment='studentlist')
+
+
+
+
+
 
 
 @blueprint.route('/<template>')
