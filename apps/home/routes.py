@@ -2,7 +2,7 @@ from apps.home import blueprint
 from flask import render_template, request, redirect, url_for
 from flask_login import login_required
 from jinja2 import TemplateNotFound
-from apps.home.models import StudentList
+from apps.home.models import Student
 from apps.home.forms import StudentListForm
 from datetime import datetime
 from apps import db
@@ -24,11 +24,11 @@ def capture():
 
 
 # 학생목록
-@blueprint.route('/StudentList')
+@blueprint.route('/Student_lists')
 @login_required
-def StudentList():
-    student_List = StudentList.query.all()
-    return render_template('/StudentList', StudentList=student_List )
+def Student_list():
+    student_List = Student.query.all()
+    return render_template('/Student_lists', Student=student_List )
 
 # 학생등록
 @blueprint.route('/StudentList_Create')
@@ -36,7 +36,7 @@ def StudentList():
 def StudentList_Create():
     form = StudentListForm(request.form)
     if request.method == "POST":
-        studentlist = StudentList()
+        studentlist = Student()
         studentlist.StudentId = form.StudentList.data
         studentlist.StudentName = form.StudentList.data
         db.session.add(studentlist)

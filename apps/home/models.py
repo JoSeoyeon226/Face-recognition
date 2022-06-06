@@ -2,8 +2,8 @@ from apps import db
 from datetime import datetime
 
 
-class StudentList(db.Model):
-    __tablename__ = 'StudentList'
+class Student(db.Model):
+    __tablename__ = 'Student'
 
     StudentId = db.Column(db.Integer, primary_key=True)
     StudentName = db.Column(db.String(64))
@@ -12,4 +12,3 @@ class StudentList(db.Model):
 
     def __repr__(self):
         return str(self.studentName)
-

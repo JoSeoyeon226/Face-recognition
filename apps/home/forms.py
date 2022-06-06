@@ -4,4 +4,4 @@ from wtforms.validators import DataRequired
 
 
 class StudentListForm(FlaskForm):
-    studentlist = StringField('학생목록', id='studentList', validators=[DataRequired()])
+    StudentList = StringField('학생목록', id='StudentId', validators=[DataRequired()])
