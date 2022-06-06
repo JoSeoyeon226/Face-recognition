@@ -27,7 +27,22 @@ def capture():
 @blueprint.route('/StudentList')
 @login_required
 def StudentList():
-    return render_template('home/StudentList.html', segment='studentlist')
+    student_List = StudentList.query.all()
+    return render_template('/StudentList', StudentList=student_List )
+
+# 학생등록
+@blueprint.route('/StudentList_Create')
+@login_required
+def StudentList_Create():
+    form = StudentListForm(request.form)
+    if request.method == "POST":
+        studentlist = StudentList()
+        studentlist.StudentId = form.StudentList.data
+        studentlist.StudentName = form.StudentList.data
+        db.session.add(studentlist)
+        db.session.commit()
+        return redirect('home_blueprint.StudentList')
+    return render_template('/home/StudentList_Create.html', form=form)
 
 
 
