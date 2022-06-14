@@ -1,0 +1,274 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 얼굴 인식(사진 관리) {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <style>
+        #video {
+            width: 500px;
+            height: 375px;
+            background-color: #666;
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">얼굴 인식(사진 관리)</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="#!">얼굴 인식</a></li>
+                                <li class="breadcrumb-item"><a href="{{ url_for('home_blueprint.name_list') }}">얼굴 인식(등록/학습)</a></li>
+                                <li class="breadcrumb-item"><a href="#!">얼굴 인식(사진 관리)</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+
+            {% with flushes = get_flashed_messages() %}
+                {% if flushes %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div>
+                            {% for message in flushes %}
+                                {{ message }}
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% if messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <div>
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+            {% endif %}
+
+            {% if errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <div>
+                        {% for error in errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+            {% endif %}
+
+            <div class="row mb-3">
+                <div class="col-sm-12">
+                    <a href="{{ url_for('home_blueprint.name_list') }}" class="btn btn-primary">얼굴 인식(등록/학습)으로 돌아가기</a>
+                </div>
+            </div>
+
+            <!-- [ Main Content ] start -->
+			<div class="row">
+			    <!-- 등록 -->
+                <div class="col-sm-6">
+                    <!-- 파일 등록 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>파일 등록</h5>
+                        </div>
+                        <div class="card-body">
+						    <form method="post" enctype = "multipart/form-data">
+                                {{ form.csrf_token }}
+                                <div class="form-group">
+                                    <label for="file">파일</label>
+                                    <input type="file" class="form-control" id="file" name="file" accept=".png, .jpg, .jpeg">
+                                </div>
+                                <button type="submit" class="btn btn-primary">등록</button>
+                            </form>
+						</div>
+					</div>
+                    <!--// 파일 등록 -->
+
+                    <!-- 카메라를 이용한 등록 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>카메라를 이용한 등록</h5>
+                        </div>
+                        <div class="card-body">
+                            <video autoplay="true" id="video"></video>
+                            <canvas class="d-none" id="capture" width="500" height="375"></canvas>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-success btn-start mr-3">시작</button>
+                            <button class="btn btn-sm btn-danger btn-stop mr-3">중지</button>
+                            <button class="btn btn-sm btn-primary btn-capture d-none mr-3">캡쳐</button>
+                            <button class="btn btn-sm btn-warning btn-capture-delete d-none mr-3">지우기</button>
+                            <button class="btn btn-sm btn-success btn-upload d-none">등록</button>
+                        </div>
+					</div>
+                    <!--// 카메라를 이용한 등록 -->
+                </div>
+                <!--// 등록 -->
+
+                <!-- 목록 -->
+				<div class="col-sm-6">
+					<div class="card">
+                        <div class="card-header">
+                            <h5>목록</h5>
+                        </div>
+                        <div class="card-body table-border-style">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>사진</th>
+                                            <th>파일</th>
+                                            <th>관리</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if face_list %}
+                                            {% for face in face_list %}
+                                                <tr>
+                                                    <td><img src="data:image/{{ face.file_extension }};base64,{{ face.image_base64 }}" height="100"></td>
+                                                    <td>
+                                                        <p>파일명 : {{ face.file_name }}</p>
+                                                        <p>크기 : {{ face.file_size }} byte</p>
+                                                        <p>생성 : {{ face.create_datetime }}</p>
+                                                    </td>
+                                                    <td><button data-url="{{ url_for('home_blueprint.face_delete', name=face.name, file_name=face.file_name) }}" class="btn btn-sm btn-danger btn-delete">삭제</button></td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="3" class="text-center">데이터가 없습니다.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+						</div>
+					</div>
+                    <!--// 목록 -->
+
+				</div>
+			</div>
+			<!-- [ Main Content ] end -->
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script>
+        function start() {
+            if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({video: true})
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                    })
+                    .catch(function (err0r) {
+                        console.log('Something went wrong!');
+                    });
+            }
+        }
+
+        function stop() {
+            let stream = video.srcObject;
+            let tracks = stream.getTracks();
+
+            for (let i = 0; i < tracks.length; i++) {
+                let track = tracks[i];
+                track.stop();
+            }
+
+            video.srcObject = null;
+        }
+
+        let video = document.querySelector('#video');
+
+        // 시작
+        $('.btn-start').on('click', function () {
+            start();
+            $('.btn-capture').removeClass('d-none');
+            $('.btn-capture-delete').addClass('d-none');
+            $('.btn-upload').addClass('d-none');
+        })
+
+        // 중지
+        $('.btn-stop').on('click', function () {
+            stop();
+            $('.btn-capture').addClass('d-none');
+            $('.btn-capture-delete').addClass('d-none');
+            $('.btn-upload').addClass('d-none');
+        })
+
+        // 캡쳐
+        $('.btn-capture').on('click', function () {
+            let capture = $('#capture')[0];
+            let ctx = capture.getContext('2d');
+            ctx.drawImage(video, 0, 0, capture.width, capture.height);
+            $('#video').addClass('d-none');
+            $('#capture').removeClass('d-none');
+            $('.btn-capture').addClass('d-none');
+            $('.btn-capture-delete').removeClass('d-none');
+            $('.btn-upload').removeClass('d-none');
+            stop();
+        })
+
+        // 캡쳐 지우기
+        $('.btn-capture-delete').on('click', function () {
+            $('#video').removeClass('d-none');
+            $('#capture').addClass('d-none');
+            $('.btn-capture').removeClass('d-none');
+            $('.btn-capture-delete').addClass('d-none');
+            $('.btn-upload').addClass('d-none');
+            start();
+        })
+
+        // 등록
+        $('.btn-upload').on('click', function () {
+            let capture = $('#capture')[0];
+            let imgDataUrl = capture.toDataURL('image/png');
+            let blobBin = atob(imgDataUrl.split(',')[1]);	// base64 데이터 디코딩
+            let array = [];
+
+            for (let i = 0; i < blobBin.length; i++) {
+                array.push(blobBin.charCodeAt(i));
+            }
+
+            let file = new Blob([new Uint8Array(array)], {type: 'image/png'});	// Blob 생성
+            let formData = new FormData();	// formData 생성
+            formData.append("file", file);	// file data 추가
+            formData.append("name", "{{ name }}")
+
+            $.ajax({
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                url: "{{ url_for("home_blueprint.face_upload") }}",
+                success: function (response) {
+                    location.reload(true);
+                },
+                error: function(request, status, error){
+                    alert(error);
+                }
+            });
+        })
+    </script>
+{% endblock javascripts %}

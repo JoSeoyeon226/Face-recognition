@@ -1,0 +1,208 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 주차별수업등록 {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block content %}
+    {#과연 필요한 에러창인가? alert를 다른 방법으로는 할 수 없는건가?#}
+    {#            {% with flushes = get_flashed_messages() %}#}
+    {#                {% if flushes %}#}
+    {#                    <div class="alert alert-success alert-dismissible fade show" role="alert">#}
+    {#                        <div>#}
+    {#                            {% for message in flushes %}#}
+    {#                                {{ message }}#}
+    {#                            {% endfor %}#}
+    {#                        </div>#}
+    {#                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>#}
+    {#                    </div>#}
+    {#                {% endif %}#}
+    {#            {% endwith %}#}
+    {##}
+    {#            {% if messages %}#}
+    {#                <div class="alert alert-primary alert-dismissible fade show" role="alert">#}
+    {#                    <div>#}
+    {#                        {% for message in messages %}#}
+    {#                            {{ message }}#}
+    {#                        {% endfor %}#}
+    {#                    </div>#}
+    {#                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>#}
+    {#                </div>#}
+    {#            {% endif %}#}
+    {##}
+    {#            {% if errors %}#}
+    {#                <div class="alert alert-danger alert-dismissible fade show" role="alert">#}
+    {#                    <div>#}
+    {#                        {% for error in errors %}#}
+    {#                            {{ error }}#}
+    {#                        {% endfor %}#}
+    {#                    </div>#}
+    {#                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>#}
+    {#                </div>#}
+    {#            {% endif %}#}
+
+    <!-- [ Main Content ] start -->
+    <div class="row">
+        <!-- [ sample-page ] start -->
+        <div class="col-sm-12">
+
+            <!-- 등록 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>수업 등록</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <div class="mb-3 row">
+                                <label for="inputPassword" class="col-sm-2 col-form-label">수업일</label>
+                                <div class="col-sm-10">
+                                    <input type="date" class="form-control" id="classday">
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="inputPassword" class="col-sm-2 col-form-label">시작시간</label>
+                                <div class="col-sm-10">
+                                    <input type="time" class="form-control" id="starttime">
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="inputPassword" class="col-sm-2 col-form-label">종료시간</label>
+                                <div class="col-sm-10">
+                                    <input type="time" class="form-control" id="endtime">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">등록</button>
+                    </form>
+                </div>
+            </div>
+            <!--// 등록 -->
+
+            <div class="alert alert-primary alert-dismissible fade show d-none" role="alert" id="train_info">
+                <div>
+                    <span id="train_msg"></span>
+                </div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+
+            <!-- 목록 -->
+            {#                    <div class="card mt-3">#}
+            {#                        <div class="card-header">#}
+            {#                            <h5>목록</h5>#}
+            {#                            <div class="card-header-right">#}
+            {#                                <button type="button" class="btn btn-primary btm-sm btn-train-face-ajax mr-3">학습(ajax)</button>#}
+            {#                                <button class="btn btn-primary btn-train-face-ajax-loading d-none mr-3" type="button" disabled>#}
+            {#                                    <span class="spinner-border spinner-border-sm" role="status"#}
+            {#                                          aria-hidden="true"></span> 처리중...#}
+            {#                                </button>#}
+            {#                                <button type="button" class="btn btn-success btm-sm btn-train-face-socketio">학습(socketio)</button>#}
+            {#                                <button class="btn btn-success btn-train-face-socketio-loading d-none" type="button" disabled>#}
+            {#                                    <span class="spinner-border spinner-border-sm" role="status"#}
+            {#                                          aria-hidden="true"></span> 처리중...#}
+            {#                                </button>#}
+            {#                            </div>#}
+            {#                        </div>#}
+            {#                        <div class="card-body table-border-style">#}
+            {#                            <div class="table-responsive">#}
+            {#                                <table class="table table-hover">#}
+            {#                                    <thead>#}
+            {#                                    <tr>#}
+            {#                                        <th>학번</th>#}
+            {#                                        <th>이름</th>#}
+            {#                                        <th>사진</th>#}
+            {#                                        <th>관리</th>#}
+            {#                                    </tr>#}
+            {#                                    </thead>#}
+            {#                                    <tbody>#}
+            {#                                    {% if name_list %}#}
+            {#                                        {% for name in name_list %}#}
+            {#                                            <tr>#}
+            {#                                                <td>{{ name.number }}</td>#}
+            {#                                                <td>{{ name.name }}</td>#}
+            {#                                                <td>{{ name.count }}개</td>#}
+            {#                                                <td>#}
+            {#                                                    <a href="{{ url_for('home_blueprint.face_list', name=name.name) }}"#}
+            {#                                                       class="btn btn-sm btn-primary btn-faces">사진 관리</a>#}
+            {#                                                    <a href="{{ url_for('home_blueprint.name_delete', name=name.name) }}"#}
+            {#                                                            class="btn btn-sm btn-danger btn-delete">삭제</a>#}
+            {#                                                </td>#}
+            {#                                            </tr>#}
+            {#                                        {% endfor %}#}
+            {#                                    {% else %}#}
+            {#                                        <tr>#}
+            {#                                            <td colspan="2" class="text-center">데이터가 없습니다.</td>#}
+            {#                                        </tr>#}
+            {#                                    {% endif %}#}
+            {#                                    </tbody>#}
+            {#                                </table>#}
+            {#                            </div>#}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                    <!--// 목록 -->#}
+
+        </div>
+        <!-- [ sample-page ] end -->
+    </div>
+    <!-- [ Main Content ] end -->
+    </div>
+    </div>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script>
+        let training_face = false;
+
+        socket.on('train face', function (data) {
+            $('#train_msg').text(data);
+            $('#train_info').removeClass('d-none');
+
+            if (data == '얼굴 학습 완료') {
+                $('.btn-train-face-ajax').removeClass('d-none');
+                $('.btn-train-face-ajax-loading').addClass('d-none');
+                $('.btn-train-face-socketio').removeClass('d-none');
+                $('.btn-train-face-socketio-loading').addClass('d-none');
+                training_face = false;
+            }
+        });
+
+        $('.btn-train-face-socketio').on('click', function () {
+            $('.btn-train-face-ajax').addClass('d-none');
+            $('.btn-train-face-ajax-loading').addClass('d-none');
+            $('.btn-train-face-socketio').addClass('d-none');
+            $('.btn-train-face-socketio-loading').removeClass('d-none');
+            socket.emit('train face', '');
+            training_face = true;
+        })
+
+        $('.btn-train-face-ajax').on('click', function () {
+            $('.btn-train-face-ajax').addClass('d-none');
+            $('.btn-train-face-ajax-loading').removeClass('d-none');
+            $('.btn-train-face-socketio').addClass('d-none');
+            $('.btn-train-face-socketio-loading').addClass('d-none');
+            training_face = true;
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ url_for("home_blueprint.train_face") }}',
+                success: function (response) {
+                    $('.btn-train-face-ajax').removeClass('d-none');
+                    $('.btn-train-face-ajax-loading').addClass('d-none');
+                    $('.btn-train-face-socketio').addClass('d-none');
+                    $('.btn-train-face-socketio-loading').addClass('d-none');
+                    training_face = false;
+                    alert('학습이 완료되었습니다.')
+                },
+                error: function (request, status, error) {
+                    alert(error);
+                }
+            });
+        })
+    </script>
+{% endblock javascripts %}

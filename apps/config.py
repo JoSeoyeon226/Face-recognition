@@ -5,8 +5,8 @@ Copyright (c) 2019 - present AppSeed.us
 
 import os
 
-class Config(object):
 
+class Config(object):
     basedir = os.path.abspath(os.path.dirname(__file__))
 
     # Set up the App SECRET_KEY
@@ -15,7 +15,8 @@ class Config(object):
 
     # This will create a file in <app> FOLDER
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False 
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -27,12 +28,12 @@ class ProductionConfig(Config):
 
     # PostgreSQL database
     SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}'.format(
-        os.getenv('DB_ENGINE'   , 'mysql'),
-        os.getenv('DB_USERNAME' , 'appseed_flask_usr'),
-        os.getenv('DB_PASS'     , 'pass'),
-        os.getenv('DB_HOST'     , 'localhost'),
-        os.getenv('DB_PORT'     , 3306),
-        os.getenv('DB_NAME'     , 'appseed_flask')
+        os.getenv('DB_ENGINE', 'mysql'),
+        os.getenv('DB_USERNAME', 'appseed_flask_usr'),
+        os.getenv('DB_PASS', 'pass'),
+        os.getenv('DB_HOST', 'localhost'),
+        os.getenv('DB_PORT', 3306),
+        os.getenv('DB_NAME', 'appseed_flask')
     )
 
 
@@ -43,5 +44,5 @@ class DebugConfig(Config):
 # Load all possible configurations
 config_dict = {
     'Production': ProductionConfig,
-    'Debug'     : DebugConfig
+    'Debug': DebugConfig
 }

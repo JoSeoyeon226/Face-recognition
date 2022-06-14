@@ -8,77 +8,144 @@
 {% block content %}
 
 
-<div class="py-4">
-    <div class="d-flex justify-content-between w-100 flex-wrap">
-        <div class="mb-3 mb-lg-0">
-            <h1 class="h3">[학생목록]</h1>
-        </div>
-        <div>
-            <a href="StudentList_Create.html" class="btn btn-info">학생 등록</a>
+    <div class="py-4">
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h3">[학생목록]</h1>
+            </div>
+            <div>
+                <a href="name_list" class="btn btn-info">학생 등록</a>
+            </div>
+
         </div>
     </div>
-</div>
+ {% with flushes = get_flashed_messages() %}
+                {% if flushes %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div>
+                            {% for message in flushes %}
+                                {{ message }}
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                {% endif %}
+            {% endwith %}
 
-
-<div class="card border-0 shadow mb-4">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-centered table-nowrap mb-0 rounded">
-                <thead class="thead-light">
-                <tr>
-                    <th class="border-0">학번</th>
-                    <th class="border-0">이름</th>
-                    <th class="border-0">출석시간</th>
-                    <th class="border-0">수정일시</th>
-                </tr>
-                </thead>
-                <tbody>
-                    {% if StudentList %}
-                        {% for home in StudentList %}
-                            <tr>
-                                <td>{{ StudentList.StudentName }}</td>
-                                <td>{{ StudentList.created_datetime }}</td>
-                                <td>
-                                    <a href="StudentList_Update/{ StudentId }}" class="btn btn-warning btn-sm">수정</a>
-                                    <button type="button" class="btn btn-danger btn-sm btn-show-modal-delete" data-url="StudentList_Delete/{{ StudentId }}">삭제</button>
-                                </td>
-                            </tr>
+            {% if messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <div>
+                        {% for message in messages %}
+                            {{ message }}
                         {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="3">데이터가 없습니다.</td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+            {% endif %}
 
-<!--<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h2 class="h6 modal-title">삭제</h2>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-              <p>데이터를 삭제하시겠습니까?</p>
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-danger btn-delete-confirm">삭제</button>
-              <button type="button" class="btn btn-link text-gray-600 ms-auto" data-bs-dismiss="modal">취소</button>
+            {% if errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <div>
+                        {% for error in errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+            {% endif %}
+
+            <!-- [ Main Content ] start -->
+            <div class="row">
+                <!-- [ sample-page ] start -->
+                <div class="col-sm-12">
+
+
+                    <div class="alert alert-primary alert-dismissible fade show d-none" role="alert" id="train_info">
+                        <div>
+                            <span id="train_msg"></span>
+                        </div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+
+                    <!-- 목록 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>목록</h5>
+                            <div class="card-header-right">
+                                <button type="button" class="btn btn-primary btm-sm btn-train-face-ajax mr-3">학습(ajax)</button>
+                                <button class="btn btn-primary btn-train-face-ajax-loading d-none mr-3" type="button" disabled>
+                                    <span class="spinner-border spinner-border-sm" role="status"
+                                          aria-hidden="true"></span> 처리중...
+                                </button>
+                                <button type="button" class="btn btn-success btm-sm btn-train-face-socketio">학습(socketio)</button>
+                                <button class="btn btn-success btn-train-face-socketio-loading d-none" type="button" disabled>
+                                    <span class="spinner-border spinner-border-sm" role="status"
+                                          aria-hidden="true"></span> 처리중...
+                                </button>
+                            </div>
+                        </div>
+
+                    <div class="card border-0 shadow mb-4">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-centered table-nowrap mb-0 rounded">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="border-0">학번</th>
+                                        <th class="border-0">사진</th>
+                                        <th class="border-0">관리</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if name_list %}
+                                        {% for name in name_list %}
+                                            <tr>
+                                                <td>{{ name.name }}</td>
+                                                <td>{{ name.count }}개</td>
+                                                <td>
+                                                    <a href="{{ url_for('home_blueprint.face_list', name=name.name) }}"
+                                                       class="btn btn-sm btn-primary btn-faces">사진 관리</a>
+                                                    <a href="{{ url_for('home_blueprint.name_delete', name=name.name) }}"
+                                                       class="btn btn-sm btn-danger btn-delete">삭제</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="2" class="text-center">데이터가 없습니다.</td>
+                                        </tr>
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+    <!--<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="h6 modal-title">삭제</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <p>데이터를 삭제하시겠습니까?</p>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-danger btn-delete-confirm">삭제</button>
+                  <button type="button" class="btn btn-link text-gray-600 ms-auto" data-bs-dismiss="modal">취소</button>
+              </div>
           </div>
       </div>
-  </div>
-</div>  -->
+    </div>  -->
 
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE
+<!-- Specific Page JS goes HERE-->
 {% block javascripts %}
 <script>
-    let url = '';
 
     $('.btn-show-modal-delete').on('click', function() {
         url = $(this).data('url');
@@ -89,5 +156,56 @@
     $('.btn-delete-confirm').on('click', function() {
         $(location).attr('href', url);
     })
+
+  let training_face = false;
+
+        socket.on('train face', function (data) {
+            $('#train_msg').text(data);
+            $('#train_info').removeClass('d-none');
+
+            if (data == '얼굴 학습 완료') {
+                $('.btn-train-face-ajax').removeClass('d-none');
+                $('.btn-train-face-ajax-loading').addClass('d-none');
+                $('.btn-train-face-socketio').removeClass('d-none');
+                $('.btn-train-face-socketio-loading').addClass('d-none');
+                training_face = false;
+            }
+        });
+
+        $('.btn-train-face-socketio').on('click', function () {
+            $('.btn-train-face-ajax').addClass('d-none');
+            $('.btn-train-face-ajax-loading').addClass('d-none');
+            $('.btn-train-face-socketio').addClass('d-none');
+            $('.btn-train-face-socketio-loading').removeClass('d-none');
+            socket.emit('train face', '');
+            training_face = true;
+        })
+
+        $('.btn-train-face-ajax').on('click', function () {
+            $('.btn-train-face-ajax').addClass('d-none');
+            $('.btn-train-face-ajax-loading').removeClass('d-none');
+            $('.btn-train-face-socketio').addClass('d-none');
+            $('.btn-train-face-socketio-loading').addClass('d-none');
+            training_face = true;
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ url_for("home_blueprint.train_face") }}',
+                success: function (response) {
+                    $('.btn-train-face-ajax').removeClass('d-none');
+                    $('.btn-train-face-ajax-loading').addClass('d-none');
+                    $('.btn-train-face-socketio').addClass('d-none');
+                    $('.btn-train-face-socketio-loading').addClass('d-none');
+                    training_face = false;
+                    alert('학습이 완료되었습니다.')
+                },
+                error: function (request, status, error) {
+                    alert(error);
+                }
+            });
+        })
+
+
+
 </script>
-{% endblock javascripts %}-->
+{% endblock javascripts %}

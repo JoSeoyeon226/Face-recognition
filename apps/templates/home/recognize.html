@@ -1,0 +1,156 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 얼굴 인식 {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <style>
+        #video {
+            width: 500px;
+            height: 375px;
+            background-color: #666;
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">얼굴 인식</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="#!">얼굴 인식</a></li>
+                                <li class="breadcrumb-item"><a href="#!">얼굴 인식</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+
+            <!-- [ Main Content ] start -->
+            <div class="row">
+
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>카메라</h5>
+                        </div>
+                        <div class="card-body">
+                            <video autoplay="true" id="video"></video>
+                            <canvas class="d-none" id="capture" width="500" height="375"></canvas>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-success btn-start mr-3">시작</button>
+                            <button class="btn btn-sm btn-danger btn-stop mr-3">중지</button>
+                            <button class="btn btn-sm btn-primary btn-recognize-face">얼굴 인식</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>얼굴 인식</h5>
+                        </div>
+                        <div class="card-body">
+                            <img src="https://via.placeholder.com/400" class="img-fluid" id="image_base64">
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-danger btn-delete-recognize-face mr-3">지우기</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- [ Main Content ] end -->
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script>
+        function start() {
+            if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({video: true})
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                    })
+                    .catch(function (err0r) {
+                        console.log('Something went wrong!');
+                    });
+            }
+        }
+
+        function stop() {
+            let stream = video.srcObject;
+            let tracks = stream.getTracks();
+
+            for (let i = 0; i < tracks.length; i++) {
+                let track = tracks[i];
+                track.stop();
+            }
+
+            video.srcObject = null;
+        }
+
+        let video = document.querySelector('#video');
+
+        start();
+
+        // 시작
+        $('.btn-start').on('click', function () {
+            start();
+        })
+
+        // 중지
+        $('.btn-stop').on('click', function () {
+            stop();
+        })
+
+        // 얼굴 인식
+        $('.btn-recognize-face').on('click', function () {
+            let capture = $('#capture')[0];
+            let ctx = capture.getContext('2d');
+            ctx.drawImage(video, 0, 0, capture.width, capture.height);
+
+            let imgDataUrl = capture.toDataURL('image/png');
+            let imageData = imgDataUrl.replace('data:image/png;base64,', '');
+
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify({"imageData": imageData}),
+                url: "{{ url_for("face_blueprint.recognize_post") }}",
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    if (response) {
+                        let image_base64 = response["image_base64"]
+                        $("#image_base64").attr("src", "data:image/jpg;base64," + image_base64)
+                    } else {
+                        alert("예측 정보를 불러올 수 없습니다");
+                    }
+                },
+                error: function(request, status, error){
+                    alert(error);
+                }
+            });
+        })
+
+        // 지우기
+        $('.btn-delete-recognize-face').on('click', function () {
+            $("#image_base64").attr("src", "https://via.placeholder.com/400")
+        })
+    </script>
+{% endblock javascripts %}

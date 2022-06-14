@@ -1,11 +1,11 @@
 {% extends "layouts/base_student.html" %}
 
-{% block title %} 웹카메라 - 카메라 캡쳐 {% endblock %}
+{% block title %} 얼굴 인식 {% endblock %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}
     <style>
-        #videoElement {
+        #video {
             width: 500px;
             height: 375px;
             background-color: #666;
@@ -23,7 +23,10 @@
                 <div class="page-block">
                     <div class="row align-items-center">
                         <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">출석 체크</h5>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -33,32 +36,37 @@
             <!-- [ Main Content ] start -->
             <div class="row">
 
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <div class="card">
                         <div class="card-header">
                             <h5>카메라</h5>
                         </div>
                         <div class="card-body">
-                            <video autoplay="true" id="videoElement"></video>
+                            <video autoplay="true" id="video"></video>
+                            <canvas class="d-none" id="capture" width="500" height="375"></canvas>
                         </div>
                         <div class="card-footer">
                             <button class="btn btn-sm btn-success btn-start mr-3">시작</button>
                             <button class="btn btn-sm btn-danger btn-stop mr-3">중지</button>
-                            <button class="btn btn-sm btn-primary btn-capture">캡쳐</button>
+                            <button class="btn btn-sm btn-primary btn-recognize-face">얼굴 인식</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <div class="card">
                         <div class="card-header">
-                            <h5>캡쳐</h5>
+                            <h5>얼굴 인식</h5>
                         </div>
                         <div class="card-body">
-                            <canvas id="capture" width="500" height="375" style="border: 1px solid #ddd;"></canvas>
+                            <img src="https://via.placeholder.com/400" class="img-fluid" id="image_base64">
                         </div>
                         <div class="card-footer">
-                            <button class="btn btn-sm btn-danger btn-capture-delete">지우기</button>
+                            <button class="btn btn-sm btn-danger btn-delete-recognize-face mr-3">지우기</button>
+                            <!--<text class="print" id="name"> {{name}}</text>-->
+                            <span id="selectname"></span>
+                            <button class="btn btn-sm btn-danger" style="display:none;" id="btn">출석체크</button>
+
                         </div>
                     </div>
                 </div>
@@ -74,33 +82,7 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
     <script>
-        let video = document.querySelector('#videoElement');
-
-        if (navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({video: true})
-                .then(function (stream) {
-                    video.srcObject = stream;
-                })
-                .catch(function (err0r) {
-                    console.log('Something went wrong!');
-                });
-        }
-
-        // 중지
-        $(".btn-stop").on('click', function () {
-            let stream = video.srcObject;
-            let tracks = stream.getTracks();
-
-            for (let i = 0; i < tracks.length; i++) {
-                let track = tracks[i];
-                track.stop();
-            }
-
-            video.srcObject = null;
-        })
-
-        // 시작
-        $(".btn-start").on('click', function () {
+        function start() {
             if (navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({video: true})
                     .then(function (stream) {
@@ -110,20 +92,84 @@
                         console.log('Something went wrong!');
                     });
             }
+        }
+
+        function stop() {
+            let stream = video.srcObject;
+            let tracks = stream.getTracks();
+
+            for (let i = 0; i < tracks.length; i++) {
+                let track = tracks[i];
+                track.stop();
+            }
+
+            video.srcObject = null;
+        }
+
+        let video = document.querySelector('#video');
+
+        start();
+
+        // 시작
+        $('.btn-start').on('click', function () {
+            start();
         })
 
-        // 캡쳐
-        $(`.btn-capture`).on('click', function () {
+
+        $('.btn').on('click', function () {
+             $("#selectname").text('출석체크가 완료되었습니다');
+             $("#btn").hide();
+
+        })
+
+
+        // 중지
+        $('.btn-stop').on('click', function () {
+            stop();
+        })
+
+        // 얼굴 인식
+        $('.btn-recognize-face').on('click', function () {
             let capture = $('#capture')[0];
             let ctx = capture.getContext('2d');
             ctx.drawImage(video, 0, 0, capture.width, capture.height);
+
+            let imgDataUrl = capture.toDataURL('image/png');
+            let imageData = imgDataUrl.replace('data:image/png;base64,', '');
+            //let name = capture.getContext('name');
+
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify({"imageData": imageData}),
+                url: "{{ url_for("Capture_blueprint.recognize_post") }}",
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    if (response) {
+                        let image_base64 = response["image_base64"]
+                        let name = response["zname"]
+
+                        $("#image_base64").attr("src", "data:image/jpg;base64," + image_base64);
+                        if(name == "unknown") {
+                            $("#selectname").text('등록이 되지 않은 학생입니다.');
+                        } else {
+                            $("#selectname").text(name + '님 출석체크 하시겠습니까?');
+                            $("#btn").show();
+                        }
+
+                    } else {
+                        alert("예측 정보를 불러올 수 없습니다");
+                    }
+                },
+                error: function(request, status, error){
+                    alert(error);
+                }
+            });
         })
 
         // 지우기
-        $(".btn-capture-delete").on('click', function () {
-            let capture = $('#capture')[0];
-            let ctx = capture.getContext('2d');
-            ctx.clearRect(0, 0, capture.width, capture.height);
+        $('.btn-delete-recognize-face').on('click', function () {
+            $("#image_base64").attr("src", "https://via.placeholder.com/400")
+            $("#selectname").text('');
         })
     </script>
 {% endblock javascripts %}

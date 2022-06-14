@@ -1,3 +1,5 @@
+<!-- jquery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <!-- Core -->
 <script src="/static/assets/vendor/@popperjs/core/dist/umd/popper.min.js"></script>
@@ -39,3 +41,31 @@
 
 <!-- Volt JS -->
 <script src="/static/assets/js/volt.js"></script>
+
+<!-- socket -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    let socket = io('/ws');
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+
+    socket.on('connect response', function(data) {
+        console.log(data);
+    });
+</script>
+<!--// socket -->
+
+
+<script>
+    let url = "";
+
+    $(".btn-delete").on("click", function() {
+        url = $(this).data("url");
+        $('#deleteModal').modal('show')
+    })
+
+    $(".btn-delete-confirm").on("click", function() {
+        $(location).attr("href", url);
+    })
+</script>

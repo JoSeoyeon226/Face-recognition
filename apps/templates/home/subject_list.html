@@ -1,0 +1,169 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 과목등록 {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <style>
+        #video {
+            width: 500px;
+            height: 375px;
+            background-color: #666;
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+    {#과연 필요한 에러창인가? alert를 다른 방법으로는 할 수 없는건가?#}
+    {#            {% with flushes = get_flashed_messages() %}#}
+    {#                {% if flushes %}#}
+    {#                    <div class="alert alert-success alert-dismissible fade show" role="alert">#}
+    {#                        <div>#}
+    {#                            {% for message in flushes %}#}
+    {#                                {{ message }}#}
+    {#                            {% endfor %}#}
+    {#                        </div>#}
+    {#                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>#}
+    {#                    </div>#}
+    {#                {% endif %}#}
+    {#            {% endwith %}#}
+    {##}
+    {#            {% if messages %}#}
+    {#                <div class="alert alert-primary alert-dismissible fade show" role="alert">#}
+    {#                    <div>#}
+    {#                        {% for message in messages %}#}
+    {#                            {{ message }}#}
+    {#                        {% endfor %}#}
+    {#                    </div>#}
+    {#                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>#}
+    {#                </div>#}
+    {#            {% endif %}#}
+    {##}
+    {#            {% if errors %}#}
+    {#                <div class="alert alert-danger alert-dismissible fade show" role="alert">#}
+    {#                    <div>#}
+    {#                        {% for error in errors %}#}
+    {#                            {{ error }}#}
+    {#                        {% endfor %}#}
+    {#                    </div>#}
+    {#                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>#}
+    {#                </div>#}
+    {#            {% endif %}#}
+
+    <!-- [ Main Content ] start -->
+    <div class="row">
+        <!-- [ sample-page ] start -->
+        <div class="col-sm-12">
+
+            <!-- 등록 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>과목 등록</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {#{{ form.csrf_token }}#}
+                        <div class="form-group">
+                            {#<input type="text" class="form-control mb-2" id="name" name="name" placeholder="과목명">#}
+                            {#<input type="text" class="form-control mb-2" id="name" name="name" placeholder="">#}
+                            <div class="mb-3 row">
+                                <label for="inputPassword" class="col-sm-2 col-form-label">교수명</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="professor" placeholder="">
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="staticEmail" class="col-sm-2 col-form-label">과목명</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="classname">
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="inputPassword" class="col-sm-2 col-form-label">과목코드</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="classcode">
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="inputPassword" class="col-sm-2 col-form-label">수업연도</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="semester" placeholder="예시)2022-1">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">등록</button>
+                    </form>
+                </div>
+            </div>
+            <!--// 등록 -->
+
+            <div class="alert alert-primary alert-dismissible fade show d-none" role="alert" id="train_info">
+                <div>
+                    <span id="train_msg"></span>
+                </div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+
+        </div>
+        <!-- [ sample-page ] end -->
+    </div>
+    <!-- [ Main Content ] end -->
+    </div>
+    </div>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script>
+        let training_face = false;
+
+        socket.on('train face', function (data) {
+            $('#train_msg').text(data);
+            $('#train_info').removeClass('d-none');
+
+            if (data == '얼굴 학습 완료') {
+                $('.btn-train-face-ajax').removeClass('d-none');
+                $('.btn-train-face-ajax-loading').addClass('d-none');
+                $('.btn-train-face-socketio').removeClass('d-none');
+                $('.btn-train-face-socketio-loading').addClass('d-none');
+                training_face = false;
+            }
+        });
+
+        $('.btn-train-face-socketio').on('click', function () {
+            $('.btn-train-face-ajax').addClass('d-none');
+            $('.btn-train-face-ajax-loading').addClass('d-none');
+            $('.btn-train-face-socketio').addClass('d-none');
+            $('.btn-train-face-socketio-loading').removeClass('d-none');
+            socket.emit('train face', '');
+            training_face = true;
+        })
+
+        $('.btn-train-face-ajax').on('click', function () {
+            $('.btn-train-face-ajax').addClass('d-none');
+            $('.btn-train-face-ajax-loading').removeClass('d-none');
+            $('.btn-train-face-socketio').addClass('d-none');
+            $('.btn-train-face-socketio-loading').addClass('d-none');
+            training_face = true;
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ url_for("home_blueprint.train_face") }}',
+                success: function (response) {
+                    $('.btn-train-face-ajax').removeClass('d-none');
+                    $('.btn-train-face-ajax-loading').addClass('d-none');
+                    $('.btn-train-face-socketio').addClass('d-none');
+                    $('.btn-train-face-socketio-loading').addClass('d-none');
+                    training_face = false;
+                    alert('학습이 완료되었습니다.')
+                },
+                error: function (request, status, error) {
+                    alert(error);
+                }
+            });
+        })
+    </script>
+{% endblock javascripts %}
