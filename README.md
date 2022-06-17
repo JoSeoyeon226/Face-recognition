@@ -186,7 +186,7 @@ The project is coded using blueprints, app factory pattern, dual configuration p
    |    |    |    |-- base.html             # Used by common pages
    |    |    |
    |    |    |-- accounts/                  # Authentication pages
-   |    |    |    |-- login.html            # Login page
+   |    |    |    |-- AdminLogin.html       # Login page
    |    |    |    |-- register.html         # Register page
    |    |    |
    |    |    |-- home/                      # UI Kit Pages

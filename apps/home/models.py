@@ -17,4 +17,3 @@ class Subject(db.Model):
         return str(f"{self.Professor_name}, {self.Subject_name}, {self.Subject_code}, {self.Semester}")
     #왜 안될까.
 
-
